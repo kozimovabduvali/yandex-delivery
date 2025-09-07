@@ -14,20 +14,50 @@ function App() {
             controls: []
           });
 
-          const placemark = new window.ymaps.Placemark(
-            [55.751244, 37.618423],
-            { hintContent: "Marra joyi" },
-            { preset: "islands#redFlagIcon" }
-          );
+          let placemark = null;
 
-          map.geoObjects.add(placemark);
+          const findAddress = (address) => {
+            window.ymaps.geocode(address, { results: 1 }).then((res) => {
+              const firstGeoObject = res.geoObjects.get(0);
+              if (!firstGeoObject) return;
+
+              const coords = firstGeoObject.geometry.getCoordinates();
+              const name = firstGeoObject.getAddressLine();
+
+              if (placemark) {
+                map.geoObjects.remove(placemark);
+              }
+
+              placemark = new window.ymaps.Placemark(
+                coords,
+                { balloonContent: name },
+                { preset: "islands#redIcon" }
+              );
+
+              map.geoObjects.add(placemark);
+              map.setCenter(coords, 16);
+            });
+          };
+
+          const btn = document.getElementById("findBtn");
+          const input = document.getElementById("adress1");
+
+          if (btn && input) {
+            btn.addEventListener("click", () => {
+              if (input.value) findAddress(input.value);
+            });
+
+            findAddress(input.value);
+          }
         });
       }
     };
 
-    if (!document.querySelector('script[src="https://api-maps.yandex.ru/2.1/?lang=en"]')) {
+
+    if (!document.querySelector('script[src*="api-maps.yandex.ru/2.1/"]')) {
       script = document.createElement("script");
-      script.src = "https://api-maps.yandex.ru/2.1/?lang=en";
+      script.src =
+        "https://api-maps.yandex.ru/2.1/?apikey=d8d80a96-bfba-4810-baaf-e4a249cb1729&lang=ru_RU";
       script.async = true;
       script.onload = loadMap;
       document.body.appendChild(script);
@@ -35,12 +65,17 @@ function App() {
       loadMap();
     }
 
-    // Cleanup
     return () => {
       const mapEl = document.getElementById("map");
       if (mapEl) mapEl.innerHTML = "";
     };
   }, []);
+
+  if (window.ymaps) {
+    console.log("done");
+  } else {
+    console.error("eror");
+  }
 
   const [openIndex, setOpenIndex] = useState(null);
 
@@ -84,8 +119,8 @@ function App() {
 
               <input
                 type="text"
-                name="adress"
-                id="adress"
+                name="adress1"
+                id="adress1"
                 className="font-medium w-full md:max-w-90 lg:max-w-115 bg-[#EEEEEE] rounded-[10px] outline-none max-md:!py-2.5 p-4.5"
                 defaultValue={'Орeхoвo-Зуeвo, ул. Лeнинa, 15'}
                 readOnly />
@@ -396,7 +431,8 @@ function App() {
 
           {/* 4  */}
           <div className="bg-white rounded-[20px] p-5 mt-2 md:mt-4">
-            <button className="bg-[#E13727] text-white flex items-center justify-center w-full md:h-15 rounded-2xl px-7 py-2 transition duration-200 hover:bg-[#E13727]/75">
+            <button id="findBtn"
+              className="bg-[#E13727] text-white flex items-center justify-center w-full md:h-15 rounded-2xl px-7 py-2 transition duration-200 hover:bg-[#E13727]/75">
               Пeрeйти к oплaтe
             </button>
           </div>
