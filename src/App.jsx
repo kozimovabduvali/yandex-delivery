@@ -122,7 +122,7 @@ function App() {
                 name="adress1"
                 id="adress1"
                 className="font-medium w-full md:max-w-90 lg:max-w-115 bg-[#EEEEEE] rounded-[10px] outline-none max-md:!py-2.5 p-4.5"
-                defaultValue={'Орeхoвo-Зуeвo, ул. Лeнинa, 15'}
+                defaultValue={'Орехово-Зуево, ул. Ленина, 15'}
                 readOnly />
             </div>
 
