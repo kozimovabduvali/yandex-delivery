@@ -4,70 +4,83 @@ import Logo from './assets/logo.jpg'
 function App() {
   useEffect(() => {
     let script;
+    let map;
+    let placemark;
 
-    const loadMap = () => {
-      if (window.ymaps) {
-        window.ymaps.ready(() => {
-          const map = new window.ymaps.Map("map", {
-            center: [55.751244, 37.618423],
-            zoom: 14,
-            controls: []
-          });
+    const initMap = () => {
+      if (!window.ymaps) return;
 
-          let placemark = null;
+      window.ymaps.ready(() => {
+        const mapContainer = document.getElementById("map");
+        if (!mapContainer) return;
 
-          const findAddress = (address) => {
-            window.ymaps.geocode(address, { results: 1 }).then((res) => {
-              const firstGeoObject = res.geoObjects.get(0);
-              if (!firstGeoObject) return;
-
-              const coords = firstGeoObject.geometry.getCoordinates();
-              const name = firstGeoObject.getAddressLine();
-
-              if (placemark) {
-                map.geoObjects.remove(placemark);
-              }
-
-              placemark = new window.ymaps.Placemark(
-                coords,
-                { balloonContent: name },
-                { preset: "islands#redIcon" }
-              );
-
-              map.geoObjects.add(placemark);
-              map.setCenter(coords, 16);
-            });
-          };
-
-          const btn = document.getElementById("findBtn");
-          const input = document.getElementById("adress1");
-
-          if (btn && input) {
-            btn.addEventListener("click", () => {
-              if (input.value) findAddress(input.value);
-            });
-
-            findAddress(input.value);
-          }
+        // Xarita yaratamiz
+        map = new window.ymaps.Map("map", {
+          center: [55.751244, 37.618423],
+          zoom: 14,
+          controls: []
         });
-      }
+
+        // SuggestView inputga biriktiramiz
+        const input = document.getElementById("adress1");
+        if (input) {
+          const suggestView = new window.ymaps.SuggestView("adress1");
+
+          // foydalanuvchi variantni tanlaganda
+          suggestView.events.add("select", (e) => {
+            const selected = e.get("item").value;
+            if (selected) {
+              findAddress(selected);
+            }
+          });
+        }
+
+        // manzilni topish funksiyasi
+        const findAddress = (address) => {
+          if (!address || !address.trim()) return;
+
+          window.ymaps.geocode(address, { results: 1 }).then((res) => {
+            const firstGeoObject = res.geoObjects.get(0);
+            if (!firstGeoObject) return;
+
+            const coords = firstGeoObject.geometry.getCoordinates();
+            const name = firstGeoObject.getAddressLine();
+
+            if (placemark) {
+              map.geoObjects.remove(placemark);
+            }
+
+            placemark = new window.ymaps.Placemark(
+              coords,
+              { balloonContent: name },
+              { preset: "islands#redIcon" }
+            );
+
+            map.geoObjects.add(placemark);
+            map.setCenter(coords, 16);
+          });
+        };
+      });
     };
 
-
+    // Yandex script yuklash
     if (!document.querySelector('script[src*="api-maps.yandex.ru/2.1/"]')) {
       script = document.createElement("script");
       script.src =
         "https://api-maps.yandex.ru/2.1/?apikey=d8d80a96-bfba-4810-baaf-e4a249cb1729&lang=ru_RU";
       script.async = true;
-      script.onload = loadMap;
+      script.onload = initMap;
       document.body.appendChild(script);
     } else {
-      loadMap();
+      if (window.ymaps) initMap();
     }
 
+    // cleanup
     return () => {
-      const mapEl = document.getElementById("map");
-      if (mapEl) mapEl.innerHTML = "";
+      if (map) {
+        map.destroy();
+        map = null;
+      }
     };
   }, []);
 
@@ -217,12 +230,15 @@ function App() {
               </div>
 
               <div className="w-full md:max-w-90 lg:max-w-115 space-y-2.5">
-                <input
-                  type="text"
-                  name="adress1"
-                  id="adress1"
-                  className="font-medium w-full bg-[#FFEDEA] rounded-[10px] outline-none border border-transparent focus:border-[#E13727] focus:bg-transparent max-md:!py-2.5 p-4.5"
-                  placeholder="Улицa, дом" />
+                <div>
+                  <input
+                    type="text"
+                    name="adress1"
+                    id="adress1"
+                    className="font-medium w-full bg-[#FFEDEA] rounded-[10px] outline-none border border-transparent focus:border-[#E13727] focus:bg-transparent max-md:!py-2.5 p-4.5"
+                    placeholder="Улицa, дом" />
+                </div>
+
                 {/* Acourdion Contern */}
                 {openIndex === 2 && (
                   <div className="relative z-0 pt-1.5">
@@ -425,7 +441,7 @@ function App() {
 
           {/* 4  */}
           <div className="bg-white rounded-[20px] p-5 mt-2 md:mt-4">
-            <button id="findBtn"
+            <button
               className="bg-[#E13727] text-white flex items-center justify-center w-full md:h-15 rounded-2xl px-7 py-2 transition duration-200 hover:bg-[#E13727]/75">
               Пeрeйти к oплaтe
             </button>
