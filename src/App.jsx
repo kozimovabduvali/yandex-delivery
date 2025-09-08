@@ -119,8 +119,8 @@ function App() {
 
               <input
                 type="text"
-                name="adress1"
-                id="adress1"
+                name="adress"
+                id="adress"
                 className="font-medium w-full md:max-w-90 lg:max-w-115 bg-[#EEEEEE] rounded-[10px] outline-none max-md:!py-2.5 p-4.5"
                 defaultValue={'Орехово-Зуево, ул. Ленина, 15'}
                 readOnly />
@@ -225,8 +225,8 @@ function App() {
               <div className="w-full md:max-w-90 lg:max-w-115 space-y-2.5">
                 <input
                   type="text"
-                  name="adress"
-                  id="adress"
+                  name="adress1"
+                  id="adress1"
                   className="font-medium w-full bg-[#FFEDEA] rounded-[10px] outline-none border border-transparent focus:border-[#E13727] focus:bg-transparent max-md:!py-2.5 p-4.5"
                   placeholder="Улицa, дом" />
                 {/* Acourdion Contern */}
