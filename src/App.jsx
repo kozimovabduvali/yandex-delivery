@@ -439,7 +439,7 @@ function App() {
         </div>
       </div>
 
-      <div className="md:absolute top-0 left-0 z-0 w-full h-100 md:h-screen flex items-center justify-center bg-gray-100">
+      <div className="md:absolute top-0 left-0 z-0 w-full h-100 md:h-full flex items-center justify-center bg-gray-100">
         <div id="map" className="w-full h-full rounded-lg shadow-lg" />
       </div>
 
