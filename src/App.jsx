@@ -71,12 +71,6 @@ function App() {
     };
   }, []);
 
-  if (window.ymaps) {
-    console.log("done");
-  } else {
-    console.error("eror");
-  }
-
   const [openIndex, setOpenIndex] = useState(null);
 
   const toggleAccordion = (index) => {
